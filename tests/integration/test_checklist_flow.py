@@ -66,6 +66,37 @@ def test_checklist_endpoint_flags_low_confidence_items_for_manual_review(
     assert data["overall_confidence"] == "low"
 
 
+def test_checklist_endpoint_marks_item_uncertain_when_llm_output_is_malformed(
+    db_url, patched_embeddings, patched_rerank, patched_bm25, monkeypatch
+):
+    """Regression test: mirrors the query-path fix for Gemini omitting a
+    required field from structured output — a checklist item must degrade
+    to 'uncertain' rather than crash the whole /checklist request."""
+
+    def fake_classify(description: str) -> ActivityClassification:
+        return ActivityClassification(activities=["digital_payment_token_service"], reasoning="fixture")
+
+    def fake_item_draft(prompt, schema, tier="cheap"):
+        raise ValueError("simulated malformed structured output: missing required field")
+
+    monkeypatch.setattr("services.agent.checklist.classify_business_activity", fake_classify)
+    monkeypatch.setattr("services.agent.checklist.generate_structured", fake_item_draft)
+
+    from api.main import app
+
+    client = TestClient(app)
+    response = client.post(
+        "/api/v1/checklist",
+        json={"business_description": "We operate a cross-border stablecoin payment service from Singapore."},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert all(item["applicable"] == "uncertain" for item in data["items"])
+    assert all(item["confidence"] == "low" for item in data["items"])
+    assert len(data["flagged_for_manual_review"]) == len(data["items"])
+
+
 def test_checklist_endpoint_no_activities_detected_returns_empty_items(
     db_url, patched_embeddings, patched_rerank, patched_bm25, monkeypatch
 ):

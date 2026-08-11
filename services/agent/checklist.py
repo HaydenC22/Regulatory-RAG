@@ -85,7 +85,19 @@ def _generate_item(requirement: str) -> ChecklistItem:
         "directly supports the determination and copy exactly that span verbatim.\n\n"
         f"Context:\n{context}"
     )
-    draft = generate_structured(prompt, _ItemDraft, tier="cheap")
+    try:
+        draft = generate_structured(prompt, _ItemDraft, tier="cheap")
+    except Exception as exc:  # noqa: BLE001 - malformed/unparseable structured
+        # output (e.g. a required field omitted) must degrade to "uncertain,
+        # flag for review" like any other low-confidence case, not crash the
+        # whole /checklist request.
+        return ChecklistItem(
+            requirement=requirement,
+            applicable="uncertain",
+            rationale=f"The model's response could not be parsed ({exc}).",
+            citations=[],
+            confidence="low",
+        )
 
     checks = validate_all(draft.citations, retrieved)
     applicable = draft.applicable

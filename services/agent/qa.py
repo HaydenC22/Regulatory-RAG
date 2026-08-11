@@ -97,7 +97,14 @@ def answer_question(question: str, config: RetrievalConfig = "final") -> QueryRe
     invalid_note = None
     for attempt in range(MAX_RETRIES + 1):
         prompt = _build_prompt(question, retrieved, invalid_note)
-        grounded = generate_structured(prompt, GroundedAnswer, tier="cheap")
+        try:
+            grounded = generate_structured(prompt, GroundedAnswer, tier="cheap")
+        except Exception as exc:  # noqa: BLE001 - any malformed/unparseable LLM
+            # output (e.g. a required field like `confidence` omitted from the
+            # structured response) must fall into the same retry-then-refuse
+            # path as an invalid citation, not crash the request with a 500.
+            invalid_note = f"your previous response could not be parsed ({exc})"
+            continue
         checks = validate_all(grounded.citations, retrieved)
 
         if all_valid(checks) and grounded.citations:

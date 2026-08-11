@@ -68,6 +68,37 @@ def test_query_endpoint_refuses_when_out_of_scope(
     assert data["citations"] == []
 
 
+def test_query_endpoint_refuses_cleanly_when_llm_output_is_malformed(
+    db_url, patched_embeddings, patched_rerank, patched_bm25, monkeypatch
+):
+    """Regression test: Gemini has been observed to omit a required field
+    (e.g. `confidence`) from its structured output in real usage, which
+    raises inside LangChain's parser. This must degrade to a documented
+    refusal like any other invalid-output case, not crash the request."""
+
+    def fake_generate_structured(prompt, schema, tier="cheap"):
+        if schema is ScopeClassification:
+            return ScopeClassification(in_scope=True, reason="fixture: in scope")
+        if schema is GroundedAnswer:
+            raise ValueError("simulated malformed structured output: missing required field")
+        raise AssertionError(f"Unexpected schema requested in mock: {schema}")
+
+    monkeypatch.setattr("services.llm.generate_structured", fake_generate_structured)
+    monkeypatch.setattr("services.agent.guardrails.generate_structured", fake_generate_structured)
+
+    from api.main import app
+
+    client = TestClient(app)
+    response = client.post(
+        "/api/v1/query", json={"question": "What is required before onboarding a customer?"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["refused"] is True
+    assert data["citations"] == []
+
+
 def test_health_endpoint():
     from api.main import app
 
