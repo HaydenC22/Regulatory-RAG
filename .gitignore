@@ -17,5 +17,3 @@ dist/
 build/
 node_modules/
 .streamlit/secrets.toml
-PROJECT_EXPLAINED.md
-FinTech_Portfolio_Final_3_Projects.md
