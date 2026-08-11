@@ -70,7 +70,9 @@ def test_ragas_harness_runs_end_to_end_and_produces_expected_report_shape(
     monkeypatch.setattr("services.llm.generate_structured", _fake_generate_structured)
     monkeypatch.setattr("services.agent.guardrails.generate_structured", _fake_generate_structured)
     monkeypatch.setattr("eval.ragas_harness._judge_model", lambda: object())
-    monkeypatch.setattr("eval.ragas_harness.evaluate", lambda dataset, metrics, llm: _FakeRagasReport())
+    monkeypatch.setattr(
+        "eval.ragas_harness.evaluate", lambda dataset, metrics, llm, embeddings: _FakeRagasReport()
+    )
 
     result = run_eval(GOLD_SUBSET, config="final")
 

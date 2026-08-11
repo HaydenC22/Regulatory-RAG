@@ -8,12 +8,13 @@ Default provider is Google Gemini's free tier (see ADR-0004) — free tiers are
 rate-limited, so calls are wrapped with a retry/backoff for 429s rather than
 failing a whole eval run on a transient rate-limit hit."""
 
+import re
 from functools import lru_cache
 from typing import Literal, TypeVar
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic import BaseModel
-from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
+from tenacity import RetryCallState, retry, retry_if_exception, stop_after_attempt
 
 from services.config import get_settings
 
@@ -26,10 +27,30 @@ def _is_rate_limit_error(exc: BaseException) -> bool:
     return "429" in message or "rate limit" in message or "resource_exhausted" in message
 
 
+# Google's 429 response embeds its own suggested wait, e.g. "retry_delay {\n
+# seconds: 34\n}". LangChain's own internal retry (a separate layer below
+# this one, active by default) ignores that and hammers again every ~2
+# seconds regardless — which just re-triggers the same per-minute quota
+# error dozens of times instead of actually waiting it out. This wait
+# strategy reads Google's own number when present; ChatGoogleGenerativeAI is
+# constructed with max_retries=1 below specifically so that number reaches
+# here instead of being absorbed by LangChain's internal retry first.
+_RETRY_DELAY_RE = re.compile(r"retry_delay\s*\{\s*seconds:\s*(\d+)")
+
+
+def _wait_for_rate_limit(retry_state: RetryCallState) -> float:
+    exc = retry_state.outcome.exception() if retry_state.outcome else None
+    if exc is not None:
+        match = _RETRY_DELAY_RE.search(str(exc))
+        if match:
+            return float(match.group(1)) + 2  # small buffer past the server's own estimate
+    return min(5 * (2 ** (retry_state.attempt_number - 1)), 65)
+
+
 _retry_on_rate_limit = retry(
     retry=retry_if_exception(_is_rate_limit_error),
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=2, min=2, max=60),
+    stop=stop_after_attempt(6),
+    wait=_wait_for_rate_limit,
     reraise=True,
 )
 
@@ -42,7 +63,12 @@ def _get_chat_model(tier: ModelTier) -> BaseChatModel:
     if settings.llm_provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
 
-        return ChatGoogleGenerativeAI(model=model_name, google_api_key=settings.gemini_api_key, temperature=0)
+        return ChatGoogleGenerativeAI(
+            model=model_name,
+            google_api_key=settings.gemini_api_key,
+            temperature=0,
+            max_retries=1,  # disable LangChain's own internal retry — see _wait_for_rate_limit above
+        )
 
     if settings.llm_provider == "anthropic":
         from langchain_anthropic import ChatAnthropic

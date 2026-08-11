@@ -14,6 +14,7 @@ COPY api/ api/
 COPY eval/ eval/
 COPY corpus/manifest.yaml corpus/manifest.yaml
 COPY corpus/processed/ corpus/processed/
+COPY docs/eval/ docs/eval/
 
 EXPOSE 8000
 

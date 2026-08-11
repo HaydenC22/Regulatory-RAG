@@ -11,14 +11,31 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from datasets import Dataset
+from langchain_core.embeddings import Embeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 from ragas import evaluate
 from ragas.metrics import answer_relevancy, context_precision, faithfulness
 
 from services.agent.qa import answer_question
 from services.citation.validator import citation_validity_rate, validate_all
+from services.ingestion.embed import embed_query, embed_texts
 from services.llm import get_chat_model
 from services.retrieval.pipeline import RetrievalConfig
+
+
+class _LocalRagasEmbeddings(Embeddings):
+    """Adapts our own local bge embeddings (services/ingestion/embed.py) to
+    LangChain's Embeddings interface so RAGAS uses them instead of its
+    default, which is OpenAI and requires a paid key we don't have — see
+    ADR-0003/ADR-0004. Without this, `answer_relevancy` (which needs
+    embedding-based similarity) crashes with a missing OPENAI_API_KEY error
+    even though the LLM judge itself is correctly configured for Gemini."""
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return embed_texts(texts)
+
+    def embed_query(self, text: str) -> list[float]:
+        return embed_query(text)
 
 
 @dataclass
@@ -119,6 +136,7 @@ def run_eval(gold_set: list[GoldRecord], config: RetrievalConfig) -> EvalResult:
             dataset,
             metrics=[faithfulness, answer_relevancy, context_precision],
             llm=judge,
+            embeddings=_LocalRagasEmbeddings(),
         )
         ragas_scores = {k: float(v) for k, v in report.to_pandas().mean(numeric_only=True).to_dict().items()}
 

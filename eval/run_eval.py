@@ -7,6 +7,7 @@ import argparse
 from pathlib import Path
 
 from eval.ragas_harness import EvalResult, default_gold_set_path, load_gold_set, run_eval
+from services.config import get_settings
 from services.db import get_connection
 
 REPORT_DIR = Path("docs/eval")
@@ -56,10 +57,12 @@ def render_report(config: str, result: EvalResult, baseline: EvalResult | None =
     row("latency_p50_ms", result.latency_p50_ms, baseline.latency_p50_ms if baseline else None)
     row("latency_p95_ms", result.latency_p95_ms, baseline.latency_p95_ms if baseline else None)
 
+    settings = get_settings()
     lines += [
         "",
         f"Ran against {len(result.per_question)} gold-set questions "
-        f"(see docs/eval/gold_set.jsonl). Judge model: cheap-tier Claude, temperature=0.",
+        f"(see docs/eval/gold_set.jsonl). Judge model: cheap-tier "
+        f"{settings.llm_provider}/{settings.llm_model_cheap}, temperature=0.",
     ]
     return "\n".join(lines)
 
@@ -125,7 +128,15 @@ def main() -> None:
     print(f"Wrote {report_path}")
 
     if args.config == "final":
-        baseline_result = run_eval(gold_set, config="baseline")
+        try:
+            baseline_result = run_eval(gold_set, config="baseline")
+        except Exception as exc:  # noqa: BLE001 - the final report above is
+            # already written and recorded; a baseline-phase failure (e.g.
+            # exhausted free-tier quota) shouldn't discard that real, already
+            # -completed work behind an uncaught traceback.
+            print(f"Baseline config run failed after final config succeeded: {exc}")
+            print(f"{report_path} (final-only, no baseline comparison) is still valid.")
+            return
         (REPORT_DIR / "report_baseline.md").write_text(
             render_report("baseline", baseline_result), encoding="utf-8"
         )
