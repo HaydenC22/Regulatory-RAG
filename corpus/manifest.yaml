@@ -1,0 +1,92 @@
+# Corpus manifest for the MAS regulatory corpus.
+#
+# `pdf_url` is fetched directly by services/ingestion/fetch.py. `page_url` is the
+# human-readable MAS page the PDF was sourced from, kept as a fallback reference
+# in case MAS reorganises their media-library paths (they do, periodically).
+#
+# No sha256 is hand-pinned here: fetch.py computes it on first successful download
+# and records it in corpus/manifest.lock.yaml, then verifies against that lock on
+# every subsequent run so a MAS-side document update is visible as a diff, not a
+# silent corpus change.
+
+documents:
+  - doc_id: TRM_GUIDELINES
+    title: "Technology Risk Management Guidelines"
+    doc_type: guideline
+    notice_number: null
+    effective_date: "2021-01-18"
+    last_revised_date: "2021-01-18"
+    pdf_url: "https://www.mas.gov.sg/-/media/MAS/Regulations-and-Financial-Stability/Regulatory-and-Supervisory-Framework/Risk-Management/TRM-Guidelines-18-January-2021.pdf"
+    page_url: "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+
+  - doc_id: PSN02
+    title: "Notice PSN02 - Prevention of Money Laundering and Countering the Financing of Terrorism - Digital Payment Token Service"
+    doc_type: notice
+    notice_number: "PSN02"
+    effective_date: "2024-04-02"
+    last_revised_date: "2025-06-30"
+    pdf_url: "https://www.mas.gov.sg/-/media/amld-amendments---30-june-2025/mas-notice-psn02.pdf"
+    page_url: "https://www.mas.gov.sg/regulation/notices/psn02-aml-cft-notice---digital-payment-token-service"
+
+  - doc_id: PSN02_GUIDELINES
+    title: "Guidelines to Notice PSN02 on AML/CFT - Digital Payment Token Service"
+    doc_type: guideline
+    notice_number: "PSN02"
+    effective_date: "2024-04-02"
+    last_revised_date: "2025-07-01"
+    pdf_url: "https://www.mas.gov.sg/-/media/amld-amendments---30-june-2025/guidelines-to-mas-notice-psn02.pdf"
+    page_url: "https://www.mas.gov.sg/regulation/guidelines/guidelines-to-notice-psn02-on-aml-and-cft---dpt"
+
+  - doc_id: PSN01
+    title: "Notice PSN01 - Prevention of Money Laundering and Countering the Financing of Terrorism - Specified Payment Services"
+    doc_type: notice
+    notice_number: "PSN01"
+    effective_date: "2019-12-05"
+    last_revised_date: "2021-06-28"
+    pdf_url: "https://www.mas.gov.sg/-/media/MAS-Media-Library/regulation/notices/AMLD/psn01-aml-cft-notice---specified-payment-services/MAS-Notice-PSN01---Specified-Payment-Services.pdf"
+    page_url: "https://www.mas.gov.sg/regulation/notices/psn01-aml-cft-notice---specified-payment-services"
+
+  - doc_id: PSN07
+    title: "Notice PSN07 - Notice on Conduct"
+    doc_type: notice
+    notice_number: "PSN07"
+    effective_date: "2019-12-05"
+    last_revised_date: "2024-04-02"
+    pdf_url: "https://www.mas.gov.sg/-/media/mas-media-library/regulation/notices/pso/psn07-notice-on-conduct/notice-psn07.pdf"
+    page_url: "https://www.mas.gov.sg/regulation/notices/psn07-notice-on-conduct"
+
+  - doc_id: FEAT_PRINCIPLES
+    title: "Principles to Promote Fairness, Ethics, Accountability and Transparency (FEAT) in the Use of AI and Data Analytics"
+    doc_type: principles
+    notice_number: null
+    effective_date: "2018-11-12"
+    last_revised_date: "2018-11-12"
+    pdf_url: "https://www.mas.gov.sg/~/media/MAS/News%20and%20Publications/Monographs%20and%20Information%20Papers/FEAT%20Principles%20Final.pdf"
+    page_url: "https://www.mas.gov.sg/publications/monographs-or-information-paper/2018/feat"
+
+  - doc_id: DTSP_LICENSING_GUIDELINES
+    title: "Guidelines on Licensing for Digital Token Service Providers"
+    doc_type: guideline
+    notice_number: null
+    effective_date: "2025-06-30"
+    last_revised_date: "2025-06-30"
+    pdf_url: "https://www.mas.gov.sg/-/media/guidelines-on-licensing-for-digital-token-service-providers.pdf"
+    page_url: "https://www.mas.gov.sg/regulation/guidelines/guidelines-on-licensing-for-dtsps"
+
+  - doc_id: PROJECT_MINDFORGE
+    title: "Project MindForge Phase 1: Emerging Risks and Opportunities of Generative AI for Banks"
+    doc_type: whitepaper
+    notice_number: null
+    effective_date: "2024-05-01"
+    last_revised_date: "2024-05-01"
+    pdf_url: "https://www.mas.gov.sg/-/media/mas-media-library/schemes-and-initiatives/ftig/project-mindforge/emerging-risks-and-opportunities-of-generative-ai-for-banks.pdf"
+    page_url: "https://www.mas.gov.sg/schemes-and-initiatives/project-mindforge"
+
+  - doc_id: PS_ACT_2019
+    title: "Payment Services Act 2019 (First Schedule - Regulated Activities excerpt used for this corpus)"
+    doc_type: act_excerpt
+    notice_number: null
+    effective_date: "2020-01-28"
+    last_revised_date: null
+    pdf_url: "https://sso.agc.gov.sg/Act/PSA2019?ViewType=Pdf"
+    page_url: "https://sso.agc.gov.sg/Act/PSA2019"

@@ -1,0 +1,36 @@
+DTSP_LICENSING_GUIDELINES:
+  bytes: 351161
+  sha256: cc1be49e9cf8c821dbf07e345c961c8eca873372c38f6602d06e43fc93771460
+  source_url: https://www.mas.gov.sg/-/media/guidelines-on-licensing-for-digital-token-service-providers.pdf
+FEAT_PRINCIPLES:
+  bytes: 839722
+  sha256: 3934194d3d17a435124f514583c337432ce002b9c6fbef736d4f33849cf3d299
+  source_url: https://www.mas.gov.sg/~/media/MAS/News%20and%20Publications/Monographs%20and%20Information%20Papers/FEAT%20Principles%20Final.pdf
+PROJECT_MINDFORGE:
+  bytes: 1273099
+  sha256: 2b837b93c2375fb7167bbea134cfcce0a9ce4db519f4454b52801d80f3bdcd88
+  source_url: https://www.mas.gov.sg/-/media/mas-media-library/schemes-and-initiatives/ftig/project-mindforge/emerging-risks-and-opportunities-of-generative-ai-for-banks.pdf
+PSN01:
+  bytes: 678086
+  sha256: 4ae0e51f6d4eca8e4a1063617cdeb4a9eab7cb77623de65840d29f033ac8d817
+  source_url: https://www.mas.gov.sg/-/media/MAS-Media-Library/regulation/notices/AMLD/psn01-aml-cft-notice---specified-payment-services/MAS-Notice-PSN01---Specified-Payment-Services.pdf
+PSN02:
+  bytes: 373281
+  sha256: 417228836d7e2aa3ffe9e3901ea1bb572e2e7f51efc675162178b466c3b4944a
+  source_url: https://www.mas.gov.sg/-/media/amld-amendments---30-june-2025/mas-notice-psn02.pdf
+PSN02_GUIDELINES:
+  bytes: 741485
+  sha256: d6f4be6b9d136778f2eefe56bc9a79b23098e87a1407ea62e4b364ba16e9105a
+  source_url: https://www.mas.gov.sg/-/media/amld-amendments---30-june-2025/guidelines-to-mas-notice-psn02.pdf
+PSN07:
+  bytes: 322055
+  sha256: 913123f57082391ef9ecf1ca06e7b32f4c09f34018b318e2f51858f023368692
+  source_url: https://www.mas.gov.sg/-/media/mas-media-library/regulation/notices/pso/psn07-notice-on-conduct/notice-psn07.pdf
+PS_ACT_2019:
+  bytes: 738506
+  sha256: 6644db515eb0e28046f9726b6244907e8817e6eb05592ada2d12249326c2d9b7
+  source_url: https://sso.agc.gov.sg/Act/PSA2019?ViewType=Pdf
+TRM_GUIDELINES:
+  bytes: 592631
+  sha256: 2b8959e883bd66cb17286bdfc3e04fc181a6cd0ad786c99d4998c2d6c3e0efcb
+  source_url: https://www.mas.gov.sg/-/media/MAS/Regulations-and-Financial-Stability/Regulatory-and-Supervisory-Framework/Risk-Management/TRM-Guidelines-18-January-2021.pdf
