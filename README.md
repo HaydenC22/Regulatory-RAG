@@ -73,18 +73,33 @@ flowchart LR
 
 ## Key results
 
-*Populate this table by running `make ingest` then `make eval` — numbers
-below are placeholders until a real evaluation run has been recorded. See
-`docs/eval/report_final.md` for the full write-up once generated.*
+Measured live against all 40 gold-set questions, the real ingested 9-document
+MAS corpus, and real Gemini free-tier calls — see `docs/eval/report_final.md`
+for the full write-up and `docs/eval/baseline_vs_final.png` for the chart.
 
 | Metric | Baseline (dense-only) | Final (hybrid + rerank) | Δ |
 |---|---|---|---|
-| Faithfulness (RAGAS) | TBD | TBD | TBD |
-| Context precision (RAGAS) | TBD | TBD | TBD |
-| Answer relevancy (RAGAS) | TBD | TBD | TBD |
-| Citation validity % (programmatic) | TBD | TBD | TBD |
-| Refusal precision / recall | TBD | TBD | TBD |
-| Retrieval latency p50 / p95 | TBD | TBD | TBD |
+| Faithfulness (RAGAS) | 0.27 | 0.33 | +0.06 |
+| Context precision (RAGAS) | 0.03 | 0.33 | **+0.31** |
+| Answer relevancy (RAGAS) | 0.12 | 0.26 | +0.14 |
+| Citation validity % (programmatic) | 100.00% | 100.00% | +0.00% |
+| Refusal precision / recall | 0.42 / 0.87 | 0.45 / 0.93 | +0.03 / +0.07 |
+| Retrieval latency p50 / p95 | 2,922 ms / 46,368 ms | 3,494 ms / 43,634 ms | +573 ms / -2,734 ms |
+
+**Read this honestly, not as a highlight reel:** `citation_validity_pct` is a
+hard, deterministic code check (see `services/citation/validator.py`) — every
+citation either matches real retrieved source text or it doesn't — and it's
+100% in both configs, which is the number this project's core guarantee
+actually rests on. The RAGAS-judged metrics (faithfulness, context precision,
+answer relevancy) are scored by `gemini-flash-lite-latest` — the smallest
+free-tier Gemini model, used for both generation *and* judging — so treat
+their exact values as directional, not precise. The one result worth trusting
+without much hedging is **context precision improving 11x** (0.03 → 0.33):
+that's a large, consistent gap that matches what hybrid retrieval + reranking
+is supposed to do, and it's the concrete evidence behind
+[ADR-0002](docs/adr/0002-hybrid-search-vs-dense-only.md)'s retrieval design.
+Latency p95 is noisy in both directions — dominated by free-tier rate-limit
+retry delays, not the retrieval algorithm itself.
 
 ## Tech stack
 
