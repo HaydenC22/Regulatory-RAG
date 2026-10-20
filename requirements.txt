@@ -37,7 +37,7 @@ datasets==3.2.0
 matplotlib==3.10.0
 
 # Frontend
-streamlit==1.41.1
+streamlit==1.61.1
 httpx==0.28.1
 
 python-dotenv==1.0.1
